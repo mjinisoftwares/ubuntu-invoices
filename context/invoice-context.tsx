@@ -1,0 +1,172 @@
+"use client";
+
+import React, { createContext, useContext, useState } from "react";
+import { InvoiceData, InvoiceItem } from "@/types/invoice";
+
+interface InvoiceContextProps {
+  invoice: InvoiceData;
+  updateInvoice: (updatedFields: Partial<InvoiceData>) => void;
+  addItem: () => void;
+  removeItem: (index: number) => void;
+  updateItem: <K extends keyof InvoiceItem>(
+    index: number,
+    field: K,
+    value: InvoiceItem[K]
+  ) => void;
+}
+
+const defaultItem = (): InvoiceItem => ({
+  id: crypto.randomUUID(),
+  description: "",
+  quantity: 1,
+  rate: 0,
+  amount: 0,
+});
+
+const defaultInvoice = (): InvoiceData => {
+  const today = new Date().toISOString().split("T")[0];
+
+  return {
+    invoiceNumber: `INV-${Math.floor(
+      100000 + Math.random() * 900000
+    )}`,
+    date: today,
+    fromName: "Ubuntu Logistics",
+    fromEmail: "info@ubuntulogistics.co.ke",
+    toName: "",
+    toEmail: "",
+    items: [defaultItem()],
+    taxRate: 16,
+    taxAmount: 0,
+    subtotal: 0,
+    total: 0,
+    notes: "",
+    status: "DRAFT",
+  };
+};
+
+const recalculateTotals = (
+  state: InvoiceData
+): InvoiceData => {
+  const subtotal = state.items.reduce((sum, item) => {
+    return sum + (Number(item.amount) || 0);
+  }, 0);
+
+  const taxRate = Number(state.taxRate) || 0;
+  const taxAmount = subtotal * (taxRate / 100);
+  const total = subtotal + taxAmount;
+
+  return {
+    ...state,
+    subtotal,
+    taxAmount,
+    total,
+  };
+};
+
+const InvoiceContext = createContext<
+  InvoiceContextProps | undefined
+>(undefined);
+
+export function InvoiceProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [invoice, setInvoiceState] = useState<InvoiceData>(() =>
+    recalculateTotals(defaultInvoice())
+  );
+
+  const updateInvoice = (
+    updatedFields: Partial<InvoiceData>
+  ) => {
+    setInvoiceState((prev) =>
+      recalculateTotals({
+        ...prev,
+        ...updatedFields,
+      })
+    );
+  };
+
+  const addItem = () => {
+    setInvoiceState((prev) =>
+      recalculateTotals({
+        ...prev,
+        items: [...prev.items, defaultItem()],
+      })
+    );
+  };
+
+  const removeItem = (index: number) => {
+    setInvoiceState((prev) => {
+      const items = prev.items.filter(
+        (_, itemIndex) => itemIndex !== index
+      );
+
+      return recalculateTotals({
+        ...prev,
+        items: items.length > 0 ? items : [defaultItem()],
+      });
+    });
+  };
+
+  const updateItem = <K extends keyof InvoiceItem>(
+    index: number,
+    field: K,
+    value: InvoiceItem[K]
+  ) => {
+    setInvoiceState((prev) => {
+      const items = prev.items.map((item, itemIndex) => {
+        if (itemIndex !== index) {
+          return item;
+        }
+
+        const updatedItem = {
+          ...item,
+          [field]: value,
+        };
+
+        const quantity =
+          Number(updatedItem.quantity) || 0;
+        const rate =
+          Number(updatedItem.rate) || 0;
+
+        return {
+          ...updatedItem,
+          amount: quantity * rate,
+        };
+      });
+
+      return recalculateTotals({
+        ...prev,
+        items,
+      });
+    });
+  };
+
+  return (
+    <InvoiceContext.Provider
+      value={{
+        invoice,
+        updateInvoice,
+        addItem,
+        removeItem,
+        updateItem,
+      }}
+    >
+      {children}
+    </InvoiceContext.Provider>
+  );
+}
+
+export function useInvoice() {
+  const context = useContext(InvoiceContext);
+
+  if (!context) {
+    throw new Error(
+      "useInvoice must be used within an InvoiceProvider"
+    );
+  }
+
+  return context;
+}
