@@ -181,16 +181,7 @@ export default function QuotationPreview({ onBack }: QuotationPreviewProps) {
       .
     </li>
 
-    <li>
-      Payment confirmation should be sent via SMS, WhatsApp, or email to{' '}
-      <a
-        href="mailto:info@ubuntulogistics.co.ke"
-        className="text-blue-600 underline"
-      >
-        info@ubuntulogistics.co.ke
-      </a>
-      .
-    </li>
+  
   </ul>
 </div>
             <div className="mt-10 flex flex-row justify-between items-center gap-6">

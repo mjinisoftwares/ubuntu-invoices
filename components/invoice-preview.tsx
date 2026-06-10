@@ -197,24 +197,7 @@ export default function InvoicePreview({ onBack }: InvoicePreviewProps) {
       </span>
     </li>
 
-    <li>
-      Payment confirmation must be sent immediately via SMS, WhatsApp, or email to{" "}
-      <a
-        href="mailto:info@ubuntulogistics.co.ke"
-        className="text-blue-600 underline"
-      >
-        info@ubuntulogistics.co.ke
-      </a>
-      .
-    </li>
 
-    <li>
-      Cancellation policy: Cancellations made less than 24 hours before the service may attract a cancellation fee.
-    </li>
-
-    <li>
-      The company is not liable for delays caused by unforeseen circumstances such as traffic, weather conditions, or government restrictions.
-    </li>
   </ul>
 </div>
             <div className="mt-10 flex flex-row justify-between items-center gap-6">
