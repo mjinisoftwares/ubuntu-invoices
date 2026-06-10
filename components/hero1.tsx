@@ -3,29 +3,30 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface Image {
   src: string;
   alt: string;
   srcDark?: string;
 }
-interface Button {
+interface ButtonItem {
   text: string;
   url: string;
   icon?: React.ReactNode;
 }
 interface Buttons {
-  primary?: Button;
-  secondary?: Button;
+  primary?: ButtonItem;
+  secondary?: ButtonItem;
 }
-interface Badge {
+interface BadgeProps {
   text: string;
   announcement?: string;
   url?: string;
 }
 
 interface HeroBasicProps {
-  badge?: Badge;
+  badge?: BadgeProps;
   heading: string;
   description: string;
   buttons?: Buttons;
@@ -38,26 +39,26 @@ type Props = Partial<Hero1Props>;
 
 const defaultProps: Hero1Props = {
   badge: {
-    text: "Changelog v1.1",
-    announcement: "Check out our latest updates",
+    text: "Ubuntu Logistics SaaS",
+    announcement: "Invoice & Quotation Generator System",
   },
-  heading: "Blocks Built With Shadcn & Tailwind",
+  heading: "Smart Invoice & Quotation Generator for Ubuntu Logistics",
   description:
-    "Finely crafted components built with React, Tailwind and shadcn/ui. Developers can copy and paste these blocks directly into their project.",
+    "Create, manage, and export professional invoices and quotations in seconds. Built for logistics, transport, and service-based businesses with MPESA integration, PDF export, and automated history tracking.",
   buttons: {
     primary: {
-      text: "Browse Components",
-      url: "https://shadcnblocks.com",
+      text: "Create Invoice",
+      url: "/dashboard/invoices",
     },
     secondary: {
-      text: "View GitHub",
-      url: "https://shadcnblocks.com",
+      text: "Create Quotation",
+      url: "/dashboard/quotations",
     },
   },
   image: {
-    src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/modern/saas-hero/saas-hero-1-16x9.png",
-    srcDark: "https://deifkwefumgah.cloudfront.net/shadcnblocks/image-set/modern/saas-hero/saas-hero-1-16x9-dark.png",
-    alt: "Hero Image Placeholder",
+    src: "/ubuntu.webp",
+    srcDark: "/ubuntu.webp",
+    alt: "Ubuntu Logistics Invoice and Quotation System",
   },
 };
 
@@ -68,9 +69,10 @@ const Hero1 = (props: Props) => {
   };
 
   return (
-    <section className={cn("py-32", className)}>
-      <div className="container mx-auto px-4 md:px-8 lg:px-16">
+    <section className={cn("", className)}>
+      <div className="container mx-auto px-4 md:px-8 lg:px-16 min-h-screen">
         <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-12">
+          {/* TEXT SIDE */}
           <div className="flex flex-col items-center gap-5 text-center lg:items-start lg:text-left">
             {badge && (
               <Badge variant="outline">
@@ -78,12 +80,15 @@ const Hero1 = (props: Props) => {
                 <ArrowUpRight className="size-4" />
               </Badge>
             )}
-            <h1 className="max-w-xl text-4xl font-semibold tracking-tight text-pretty md:text-5xl lg:max-w-3xl lg:text-6xl">
+
+            <h1 className="max-w-xl text-2xl font-bold text-pretty md:text-3xl lg:max-w-3xl ">
               {heading}
             </h1>
-            <p className="max-w-5xl text-balance text-muted-foreground lg:text-xl">
+
+            <p className="max-w-5xl text-balance text-muted-foreground ">
               {description}
             </p>
+
             <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
               {buttons?.primary && (
                 <Button asChild size="lg" className="w-full sm:w-auto">
@@ -93,6 +98,7 @@ const Hero1 = (props: Props) => {
                   </a>
                 </Button>
               )}
+
               {buttons?.secondary && (
                 <Button
                   asChild
@@ -100,31 +106,25 @@ const Hero1 = (props: Props) => {
                   size="lg"
                   className="w-full sm:w-auto"
                 >
-                  <a href={buttons.secondary.url}>{buttons.secondary.text}</a>
+                  <a href={buttons.secondary.url}>
+                    {buttons.secondary.text}
+                  </a>
                 </Button>
               )}
             </div>
           </div>
-          {image.srcDark ? (
-            <>
-              <img
-                src={image.src}
-                alt={image.alt}
-                className="aspect-video w-full rounded-md border border-border object-cover object-top dark:hidden"
-              />
-              <img
-                src={image.srcDark}
-                alt={image.alt}
-                className="hidden aspect-video w-full rounded-md border border-border object-cover object-top dark:block"
-              />
-            </>
-          ) : (
-            <img
+
+          <div className="">
+            <Image
               src={image.src}
               alt={image.alt}
-              className="aspect-video w-full rounded-md border border-border object-cover object-top"
+              width={500}
+              height={500}
+              className="rounded-full border border-border object-cover object-top"
             />
-          )}
+          </div>
+
+     
         </div>
       </div>
     </section>

@@ -1,41 +1,31 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
-/**
- * Protected routes (require authentication)
- * Add all private SaaS pages here
- */
-const isProtectedRoute = createRouteMatcher([
-  // '/dashboard(.*)',
-  // '/invoices(.*)',
-  // '/quotes(.*)',
-  // '/clients(.*)',
-  // '/settings(.*)',
+const isProtectedAdminRoute = createRouteMatcher([
+  "/dashboard(.*)",
 ]);
 
-/**
- * Middleware
- * - Protects private routes
- * - Allows public routes without auth
- */
+const ADMIN_USERS = [
+  "user_3El2KuL4K7TenMjbajGRdSsKJY3",
+
+];
+
 export default clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
-    await auth.protect();
+  const { userId } = await auth();
+
+  if (isProtectedAdminRoute(req)) {
+    if (!userId) {
+      return NextResponse.redirect(new URL("/sign-in", req.url));
+    }
+
+    if (!ADMIN_USERS.includes(userId)) {
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    }
   }
+
+  return NextResponse.next();
 });
 
-/**
- * Middleware matcher configuration
- * Controls where middleware runs
- */
 export const config = {
-  matcher: [
-    // Run on all routes except Next.js internals and static files
-    '/((?!_next|.*\\..*).*)',
-
-    // Clerk auth system routes
-    '/__clerk/:path*',
-
-    // API routes (important for security)
-    '/(api|trpc)(.*)',
-  ],
+  matcher: ["/dashboard/:path*"],
 };

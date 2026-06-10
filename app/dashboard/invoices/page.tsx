@@ -11,6 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2, Edit, ArrowLeft, Eye } from "lucide-react";
 import { formatDate } from "@/utils/formatters";
 
+
+
 export default function InvoicesPage() {
   const [view, setView] = useState<"list" | "form" | "preview">("list");
   const [invoices, setInvoices] = useState<InvoiceData[]>([]);
@@ -18,6 +20,9 @@ export default function InvoicesPage() {
 
   const { invoice, updateInvoice } = useInvoice();
 
+  
+
+ 
   // ✅ SAFE LOAD (no eslint warning, no cascading renders)
   useEffect(() => {
     if (view !== "list") return;

@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Navbar1 } from "@/components/navbar1";
 
 const roboto = Roboto({subsets:['latin'],variable:'--font-sans'});
 
@@ -35,7 +36,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ClerkProvider>
           <TooltipProvider>
-          
+                <Navbar1 />
             {children}
           </TooltipProvider>
         </ClerkProvider>
