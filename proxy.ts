@@ -7,6 +7,7 @@ const isProtectedAdminRoute = createRouteMatcher([
 
 const ADMIN_USERS = [
   "user_3El2KuL4K7TenMjbajGRdSsKJY3",
+  "user_3EwqUjXWNjhCyxxSGwjMC78T5pY",
 
 ];
 
