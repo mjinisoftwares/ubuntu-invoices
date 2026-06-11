@@ -169,8 +169,8 @@ export default function InvoicePreview({ onBack }: InvoicePreviewProps) {
 
   <ul className="list-disc space-y-2 pl-5">
     <li>
-      This invoice is valid for <span className="font-medium">30 days</span> from the date of issue unless otherwise stated.
-    </li>
+      Accounts are due on demand
+        </li>
 
     <li>
       A <span className="font-medium">50% deposit (booking fee)</span> is required to confirm and secure the service booking.

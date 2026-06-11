@@ -160,7 +160,7 @@ export default function QuotationPreview({ onBack }: QuotationPreviewProps) {
   <h3 className="font-semibold underline">Terms and Conditions</h3>
 
   <ul className="list-disc space-y-1 pl-5">
-    <li>This quotation is valid for 7 days from the date of issue.</li>
+    <li>Accounts are due on demand</li>
 
     <li>
       Payment terms: A 50% booking fee is required, with the remaining balance
