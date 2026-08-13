@@ -9,10 +9,9 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { SquaresFourIcon, ListIcon, FileTextIcon } from "@phosphor-icons/react"
-import Image from "next/image"
+import { SquaresFourIcon, ListIcon, FileTextIcon, UsersIcon } from "@phosphor-icons/react"
+
 const data = {
- 
   navMain: [
     {
       title: "Dashboard",
@@ -35,8 +34,14 @@ const data = {
         <ListIcon />
       ),
     },
+    {
+      title: "Clients",
+      url: "/dashboard/clients",
+      icon: (
+        <UsersIcon />
+      ),
+    },
   ],
-
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

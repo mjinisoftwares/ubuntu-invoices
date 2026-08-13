@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ClerkProvider } from "@clerk/nextjs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navbar1 } from "@/components/navbar1";
+import { Toaster } from "@/components/ui/sonner";
 
 const roboto = Roboto({subsets:['latin'],variable:'--font-sans'});
 
@@ -40,6 +41,7 @@ export default function RootLayout({
             {children}
           </TooltipProvider>
         </ClerkProvider>
+             <Toaster />
       </body>
     </html>
   );

@@ -1,141 +1,199 @@
 "use client";
 
-import { Download, Globe, Mail, Phone } from "lucide-react";
+import { useState } from "react";
+import { Download, Globe, Mail, Phone, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
 import { useInvoice } from "@/context/invoice-context";
 import { formatDate } from "@/utils/formatters";
-import { generatePDF } from "@/utils/pdf-generator";
+import { generateInvoicePDF } from "@/utils/pdf-generator";
 import { saveInvoiceToHistory } from "@/utils/history";
+import { toast } from "sonner";
 
 interface InvoicePreviewProps {
   onBack: () => void;
+  /** Called after PDF is downloaded — parent can reset form / navigate */
+  onDownloadComplete?: () => void;
 }
 
-export default function InvoicePreview({ onBack }: InvoicePreviewProps) {
+export default function InvoicePreview({
+  onBack,
+  onDownloadComplete,
+}: InvoicePreviewProps) {
   const { invoice } = useInvoice();
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleDownloadPDF = () => {
-    generatePDF(`invoice-${invoice.invoiceNumber}`);
-    saveInvoiceToHistory(invoice);
+  const handleDownloadPDF = async () => {
+    const toastId = "invoice-pdf-download";
+    setIsGenerating(true);
+    toast.loading(`Generating PDF for Invoice #${invoice.invoiceNumber}...`, {
+      id: toastId,
+    });
+
+    try {
+      await saveInvoiceToHistory(invoice);
+      await generateInvoicePDF(invoice, `invoice-${invoice.invoiceNumber}`);
+      toast.success(
+        `Invoice #${invoice.invoiceNumber} PDF downloaded successfully!`,
+        { id: toastId }
+      );
+      onDownloadComplete?.();
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      toast.error("Failed to generate and download invoice PDF.", {
+        id: toastId,
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-6 sm:px-6 lg:px-12">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
+
+        {/* Page controls */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold">
-            Invoice Preview
-          </h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Invoice Preview</h1>
 
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button variant="outline" onClick={onBack} className="w-full sm:w-auto">
               Back
             </Button>
-            <Button onClick={handleDownloadPDF} className="w-full sm:w-auto">
-              <Download className="w-4 h-4 mr-2" />
-              Download PDF
+            <Button
+              onClick={handleDownloadPDF}
+              disabled={isGenerating}
+              className="w-full sm:w-auto"
+            >
+              {isGenerating ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4 mr-2" />
+              )}
+              {isGenerating ? "Generating…" : "Download PDF"}
             </Button>
           </div>
         </div>
 
-        <Card
+        {/* ─── A4-ratio paper card ─── */}
+        <div
           id="invoice-document"
-          className="relative overflow-hidden shadow-xl rounded-2xl bg-white"
+          className="relative bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col"
+          style={{ aspectRatio: "1 / 1.414" }}  /* A4 ratio */
         >
           {/* Watermark */}
           <img
             src="/ubuntu.webp"
             alt="watermark"
-            className="absolute inset-0 w-full h-full object-contain opacity-5 pointer-events-none"
+            className="absolute inset-0 w-full h-full object-contain opacity-5 pointer-events-none z-0"
           />
 
-          <CardContent className="p-4 sm:p-6 lg:p-10 relative z-10">
-            {/* Top Section */}
-            <div className="flex flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          {/* ── TOP ACCENT BAR ── */}
+          <div className="h-2 bg-[#1a1a2e] flex-shrink-0" />
+
+          {/* ════════════════════════════════════════
+              HEADER ZONE  —  30% of card height
+          ════════════════════════════════════════ */}
+          <div
+            className="relative z-10 flex flex-col justify-between px-6 sm:px-10"
+            style={{ height: "20%" }}
+          >
+            {/* Logo + Title row */}
+            <div className="flex flex-row justify-between items-start pt-4 gap-4">
               <img
                 src="/ubuntu.webp"
                 alt="logo"
-                className="h-16 sm:h-20 lg:h-32 w-auto object-contain"
+                className="w-24 h-auto object-contain"
               />
-
-              <div className="text-left sm:text-right">
-                <h2 className="text-2xl sm:text-3xl font-bold">
+              <div className="text-right">
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#1a1a2e] tracking-wide">
                   INVOICE
                 </h2>
-                <p className="text-gray-500 text-sm sm:text-base">
+                <p className="text-gray-500 text-xs sm:text-sm">
                   #{invoice.invoiceNumber}
                 </p>
-                <p className="text-xs sm:text-sm text-gray-500">
+                <p className="text-gray-400 text-xs">
                   {formatDate(invoice.date)}
                 </p>
               </div>
             </div>
 
-            <hr className="border-gray-300 mb-6" />
+            <hr className="border-gray-200" />
 
-            {/* From / To */}
-            <div className="flex flex-col md:flex-row justify-between gap-6 mb-8">
+            {/* FROM / BILL TO */}
+            <div className="flex flex-row justify-between gap-4 pb-2">
               <div>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
-                  FROM
-                </h3>
-                <p className="font-semibold text-lg sm:text-xl mb-2">
+                <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">
+                  From
+                </p>
+                <p className="font-semibold text-sm sm:text-base">
                   {invoice.fromName}
                 </p>
-
-                <div className="flex items-center gap-2 mb-1 text-sm">
-                  <Mail className="w-4 h-4" />
+                <div className="flex items-center gap-1 text-[9px] sm:text-xs text-gray-500">
+                  <Mail className="w-2.5 h-2.5" />
                   info@ubuntulogistics.co.ke
                 </div>
-                <div className="flex items-center gap-2 mb-1 text-sm">
-                  <Phone className="w-4 h-4" />
-                 +254 728 798589
+                <div className="flex items-center gap-1 text-[9px] sm:text-xs text-gray-500">
+                  <Phone className="w-2.5 h-2.5" />
+                  +254 728 798589
                 </div>
-                <div className="flex items-center gap-2 mb-1 text-sm">
-                  <Globe className="w-4 h-4" />
+                <div className="flex items-center gap-1 text-[9px] sm:text-xs text-gray-500">
+                  <Globe className="w-2.5 h-2.5" />
                   www.ubuntulogistics.co.ke
                 </div>
               </div>
 
-              <div className="md:text-right">
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-500 mb-1">
-                  BILL TO
-                </h3>
-                <p className="font-semibold text-lg sm:text-xl">
-                  {invoice.toName}
+              <div className="text-right">
+                <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">
+                  Bill To
                 </p>
-                <p className="text-gray-600 text-sm">
+                <p className="font-semibold text-sm sm:text-base">
+                  {invoice.toName || "—"}
+                </p>
+                <p className="text-[9px] sm:text-xs text-gray-500">
                   {invoice.toEmail}
                 </p>
               </div>
             </div>
+          </div>
 
-            {/* Table (Scrollable on Mobile) */}
-            <div className="rounded-xl border overflow-x-auto">
-              <table className="w-full min-w-[600px]">
+          {/* ════════════════════════════════════════
+              CONTENT ZONE  —  70% of card height
+          ════════════════════════════════════════ */}
+          <div
+            className="relative z-10 flex flex-col px-6 sm:px-10 overflow-hidden"
+            style={{ height: "72%" }}
+          >
+            {/* Items table */}
+            <div className="rounded-lg border overflow-hidden mb-3 mt-1">
+              <table className="w-full text-[10px] sm:text-xs">
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="text-left py-3 px-4 text-sm">Description</th>
-                    <th className="text-center py-3 px-4 text-sm">Qty</th>
-                    <th className="text-right py-3 px-4 text-sm">Rate</th>
-                    <th className="text-right py-3 px-4 text-sm">Amount</th>
+                    <th className="text-left py-2 px-3 font-semibold text-gray-600">
+                      Description
+                    </th>
+                    <th className="text-center py-2 px-3 font-semibold text-gray-600">
+                      Qty
+                    </th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-600">
+                      Rate
+                    </th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-600">
+                      Amount
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {invoice.items.map((item) => (
-                    <tr key={item.id} className="border-t">
-                      <td className="py-3 px-4 text-sm">
-                        {item.description}
-                      </td>
-                      <td className="py-3 px-4 text-center text-sm">
-                        {item.quantity}
-                      </td>
-                      <td className="py-3 px-4 text-right text-sm">
+                  {invoice.items.map((item, idx) => (
+                    <tr
+                      key={item.id}
+                      className={`border-t ${idx % 2 === 1 ? "bg-gray-50/60" : ""}`}
+                    >
+                      <td className="py-2 px-3">{item.description}</td>
+                      <td className="py-2 px-3 text-center">{item.quantity}</td>
+                      <td className="py-2 px-3 text-right">
                         KES {Number(item.rate).toFixed(2)}
                       </td>
-                      <td className="py-3 px-4 text-right font-medium text-sm">
+                      <td className="py-2 px-3 text-right font-semibold">
                         KES {Number(item.amount).toFixed(2)}
                       </td>
                     </tr>
@@ -144,82 +202,78 @@ export default function InvoicePreview({ onBack }: InvoicePreviewProps) {
               </table>
             </div>
 
-            {/* Totals */}
-            <div className="flex justify-start sm:justify-end mt-8">
-              <div className="w-full sm:w-80 bg-gray-50 p-4 rounded-xl border">
-                <div className="flex justify-between mb-2 text-sm">
-                  <span>Subtotal</span>
+            {/* Totals box */}
+            <div className="flex justify-end">
+              <div className="w-full sm:w-72 bg-gray-50 border rounded-xl p-3">
+                <div className="flex justify-between text-[10px] sm:text-xs mb-1.5">
+                  <span className="text-gray-500">Subtotal</span>
                   <span>KES {Number(invoice.subtotal).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between mb-2 text-sm">
-                  <span>Tax ({invoice.taxRate || 0}%)</span>
+                <div className="flex justify-between text-[10px] sm:text-xs mb-1.5">
+                  <span className="text-gray-500">
+                    Tax ({invoice.taxRate || 0}%)
+                  </span>
                   <span>KES {Number(invoice.taxAmount).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between font-bold text-base sm:text-lg border-t pt-2">
+                <div className="flex justify-between font-bold text-xs sm:text-sm border-t pt-1.5">
                   <span>Total</span>
                   <span>KES {Number(invoice.total).toFixed(2)}</span>
                 </div>
               </div>
             </div>
 
+            {/* Spacer pushes footer to bottom */}
+            <div className="flex-1" />
 
-     {/* Footer - Terms & Conditions */}
-<div className="space-y-3 text-sm text-gray-700 mt-8">
-  <h3 className="font-semibold underline">Terms and Conditions</h3>
+            {/* ── FOOTER (inside content zone, pinned bottom) ── */}
+            <div className="border-t border-gray-200 pt-2 pb-1">
+              {/* Terms */}
+              <h3 className="text-[9px] sm:text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-1">
+                Terms &amp; Conditions
+              </h3>
+              <ul className="list-disc pl-3 space-y-0.5 text-[8px] sm:text-[9px] text-gray-500">
+                <li>Accounts are due on demand.</li>
+                <li>
+                  A <strong>50% deposit</strong> is required to confirm booking.
+                  Remaining balance due{" "}
+                  <strong>before commencement or boarding</strong>.
+                </li>
+                <li>
+                  Services rendered only upon full payment unless prior written
+                  agreement.
+                </li>
+                <li>
+                  Payments: Cash, Bank Transfer, M-PESA. KCB Bank:{" "}
+                  <strong>1350132330</strong> (Tai Ubuntu Logistics Ltd) |
+                  M-PESA Paybill: <strong>522533</strong>, Acc:{" "}
+                  <strong>8077526</strong>.
+                </li>
+              </ul>
 
-  <ul className="list-disc space-y-2 pl-5">
-    <li>
-      Accounts are due on demand
-        </li>
-
-    <li>
-      A <span className="font-medium">50% deposit (booking fee)</span> is required to confirm and secure the service booking.
-      The remaining balance must be settled <span className="font-medium">before commencement or boarding</span>.
-    </li>
-
-    <li>
-      Services will only be rendered upon receipt of full payment unless a prior written agreement has been made.
-    </li>
-
-    <li>
-      Accepted payment methods include:
-      <span className="font-medium">
-        {" "}Cash, Bank Transfer, and Mobile Money (M-PESA)
-      </span>.
-      Payments should be made to:
-      <br />
-      <span className="font-medium">
-        KCB Bank Account: 1350132330 (Tai Ubuntu Logistics Ltd)
-      </span>
-      <br />
-      <span className="font-medium">
-         M-PESA PAYBILL: 522533, ACCOUNT:  8077526
-      </span>
-    </li>
-
-
-  </ul>
-</div>
-            <div className="mt-10 flex flex-row justify-between items-center gap-6">
-              <div className="relative">
+              {/* Stamp + footer logo */}
+              <div className="flex justify-between items-center mt-2">
+                <div className="relative w-16 sm:w-20">
+                  <img
+                    src="/stamp.webp"
+                    alt="stamp"
+                    className="w-full object-contain"
+                  />
+                  <p className="absolute inset-0 flex items-center justify-center text-[6px] sm:text-[8px] font-bold text-red-500 text-center leading-tight px-1">
+                    {formatDate(invoice.date)}
+                  </p>
+                </div>
                 <img
-                  src="/stamp.webp"
-                  alt="stamp"
-                  className="h-20 sm:h-24 lg:h-28 object-contain"
+                  src="/ubuntu.webp"
+                  alt="footer logo"
+                  className="h-10 sm:h-14 object-contain"
                 />
-                <p className="absolute inset-0 flex items-center justify-center text-xs sm:text-sm font-bold text-red-500">
-                  {formatDate(invoice.date)}
-                </p>
               </div>
-
-              <img
-                src="/ubuntu.webp"
-                alt="footer logo"
-                className="h-16 sm:h-20 lg:h-24 object-contain"
-              />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          {/* BOTTOM ACCENT BAR */}
+          <div className="h-1.5 bg-[#1a1a2e] flex-shrink-0" />
+        </div>
       </div>
     </div>
   );

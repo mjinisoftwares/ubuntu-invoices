@@ -1,8 +1,10 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+
 import { InvoiceData } from "@/types/invoice";
 import { QuotationData } from "@/types/quotation";
+import { revalidatePath } from "next/cache";
 
 export async function getInvoiceHistory(): Promise<InvoiceData[]> {
   const invoices = await prisma.invoice.findMany({
@@ -93,13 +95,16 @@ export async function saveInvoiceToHistory(invoice: InvoiceData) {
     where: { invoiceNumber: invoice.invoiceNumber },
   });
 
+  const invoiceStatus = (invoice.status || "DRAFT") as any;
+
+  let result;
   if (existingInvoice) {
     // Delete existing items to recreate them
     await prisma.invoiceItem.deleteMany({
       where: { invoiceId: existingInvoice.id },
     });
 
-    return await prisma.invoice.update({
+    result = await prisma.invoice.update({
       where: { id: existingInvoice.id },
       data: {
         issueDate: new Date(invoice.date),
@@ -108,7 +113,7 @@ export async function saveInvoiceToHistory(invoice: InvoiceData) {
         taxAmount: invoice.taxAmount,
         totalAmount: invoice.total,
         notes: notesJson,
-        status: (invoice.status || "DRAFT") as any,
+        status: invoiceStatus,
         clientId: client.id,
         items: {
           create: itemsData,
@@ -116,7 +121,7 @@ export async function saveInvoiceToHistory(invoice: InvoiceData) {
       },
     });
   } else {
-    return await prisma.invoice.create({
+    result = await prisma.invoice.create({
       data: {
         invoiceNumber: invoice.invoiceNumber,
         issueDate: new Date(invoice.date),
@@ -125,7 +130,7 @@ export async function saveInvoiceToHistory(invoice: InvoiceData) {
         taxAmount: invoice.taxAmount,
         totalAmount: invoice.total,
         notes: notesJson,
-        status: (invoice.status || "DRAFT") as any,
+        status: invoiceStatus,
         clientId: client.id,
         items: {
           create: itemsData,
@@ -133,6 +138,24 @@ export async function saveInvoiceToHistory(invoice: InvoiceData) {
       },
     });
   }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/invoices");
+  revalidatePath("/dashboard/clients");
+  return result;
+}
+
+export async function updateInvoiceStatus(invoiceNumber: string, status: string) {
+  const result = await prisma.invoice.update({
+    where: { invoiceNumber },
+    data: {
+      status: status as any,
+    },
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/invoices");
+  return result;
 }
 
 export async function getQuotationHistory(): Promise<QuotationData[]> {
@@ -240,13 +263,16 @@ export async function saveQuotationToHistory(quotation: QuotationData) {
     where: { quotationNumber: quotation.quotationNumber },
   });
 
+  const quotationStatus = (quotation.status || "DRAFT") as any;
+
+  let result;
   if (existingQuotation) {
     // Delete existing items to recreate them
     await prisma.quotationItem.deleteMany({
       where: { quotationId: existingQuotation.id },
     });
 
-    return await prisma.quotation.update({
+    result = await prisma.quotation.update({
       where: { id: existingQuotation.id },
       data: {
         issueDate: new Date(quotation.date),
@@ -254,7 +280,7 @@ export async function saveQuotationToHistory(quotation: QuotationData) {
         subtotal: quotation.total,
         totalAmount: quotation.total,
         notes: notesJson,
-        status: (quotation.status || "DRAFT") as any,
+        status: quotationStatus,
         clientId: client.id,
         items: {
           create: itemsData,
@@ -262,7 +288,7 @@ export async function saveQuotationToHistory(quotation: QuotationData) {
       },
     });
   } else {
-    return await prisma.quotation.create({
+    result = await prisma.quotation.create({
       data: {
         quotationNumber: quotation.quotationNumber,
         issueDate: new Date(quotation.date),
@@ -270,7 +296,7 @@ export async function saveQuotationToHistory(quotation: QuotationData) {
         subtotal: quotation.total,
         totalAmount: quotation.total,
         notes: notesJson,
-        status: (quotation.status || "DRAFT") as any,
+        status: quotationStatus,
         clientId: client.id,
         items: {
           create: itemsData,
@@ -278,16 +304,40 @@ export async function saveQuotationToHistory(quotation: QuotationData) {
       },
     });
   }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/quotations");
+  revalidatePath("/dashboard/clients");
+  return result;
+}
+
+export async function updateQuotationStatus(quotationNumber: string, status: string) {
+  const result = await prisma.quotation.update({
+    where: { quotationNumber },
+    data: {
+      status: status as any,
+    },
+  });
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/quotations");
+  return result;
 }
 
 export async function deleteInvoiceRecord(invoiceNumber: string) {
-  return await prisma.invoice.delete({
+  const deleted = await prisma.invoice.delete({
     where: { invoiceNumber },
   });
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/invoices");
+  return deleted;
 }
 
 export async function deleteQuotationRecord(quotationNumber: string) {
-  return await prisma.quotation.delete({
+  const deleted = await prisma.quotation.delete({
     where: { quotationNumber },
   });
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/quotations");
+  return deleted;
 }

@@ -4,10 +4,11 @@ import { useInvoice } from "@/context/invoice-context";
 import { useQuotation } from "@/context/quotation-context";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit, Loader2 } from "lucide-react";
 import { InvoiceData } from "@/types/invoice";
 import { QuotationData } from "@/types/quotation";
 import { formatDate } from "@/utils/formatters";
+import { toast } from "sonner";
 
 export default function RecordsList({ onSelectTab }: { onSelectTab: (tab: "invoice" | "quotation") => void }) {
   const [invoices, setInvoices] = useState<InvoiceData[]>([]);
@@ -32,26 +33,45 @@ export default function RecordsList({ onSelectTab }: { onSelectTab: (tab: "invoi
 
   const loadInvoice = (inv: InvoiceData) => {
     updateInvoice(inv);
+    toast.info(`Loaded invoice #${inv.invoiceNumber}`);
     onSelectTab("invoice");
   };
 
   const loadQuotation = (quot: QuotationData) => {
     updateQuotation(quot);
+    toast.info(`Loaded quotation #${quot.quotationNumber}`);
     onSelectTab("quotation");
   };
 
   const deleteInvoice = async (num: string) => {
-    await deleteInvoiceRecord(num);
-    setInvoices(await getInvoiceHistory());
+    if (!confirm(`Are you sure you want to delete Invoice #${num}?`)) return;
+    try {
+      await deleteInvoiceRecord(num);
+      toast.success(`Invoice #${num} deleted.`);
+      setInvoices(await getInvoiceHistory());
+    } catch (err) {
+      toast.error(`Failed to delete invoice #${num}`);
+    }
   };
 
   const deleteQuotation = async (num: string) => {
-    await deleteQuotationRecord(num);
-    setQuotations(await getQuotationHistory());
+    if (!confirm(`Are you sure you want to delete Quotation #${num}?`)) return;
+    try {
+      await deleteQuotationRecord(num);
+      toast.success(`Quotation #${num} deleted.`);
+      setQuotations(await getQuotationHistory());
+    } catch (err) {
+      toast.error(`Failed to delete quotation #${num}`);
+    }
   };
 
   if (loading) {
-    return <div className="text-center p-8 text-gray-500">Connecting to Database...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-muted-foreground gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-sm font-medium">Connecting to Database...</p>
+      </div>
+    );
   }
 
   return (

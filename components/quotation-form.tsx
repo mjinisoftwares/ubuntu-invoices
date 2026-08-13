@@ -1,8 +1,16 @@
-import BasicDetails from "./basic-details";
+import BasicDetails, { StatusOption } from "./basic-details";
 import ContactDetails from "./contact-details";
 import QuotationItemsList from "./quotation-items-list";
 import QuotationTotals from "./quotation-totals";
 import { useQuotation } from "@/context/quotation-context";
+
+const QUOTATION_STATUS_OPTIONS: StatusOption[] = [
+  { value: "DRAFT", label: "Draft" },
+  { value: "SENT", label: "Sent" },
+  { value: "ACCEPTED", label: "Accepted" },
+  { value: "REJECTED", label: "Rejected" },
+  { value: "EXPIRED", label: "Expired" },
+];
 
 export default function QuotationForm() {
   const { quotation, updateQuotation } = useQuotation();
@@ -16,6 +24,11 @@ export default function QuotationForm() {
         onNumberChange={(val) => updateQuotation({ quotationNumber: val })}
         date={quotation.date}
         onDateChange={(val) => updateQuotation({ date: val })}
+        dueDate={quotation.dueDate || ""}
+        onDueDateChange={(val) => updateQuotation({ dueDate: val })}
+        status={quotation.status || "DRAFT"}
+        onStatusChange={(val) => updateQuotation({ status: val })}
+        statusOptions={QUOTATION_STATUS_OPTIONS}
       />
       <ContactDetails
         fromName={quotation.fromName}

@@ -132,10 +132,7 @@ export function QuotationProvider({
 
   const saveQuotation = async () => {
     try {
-      const status =
-        quotation.status === "DRAFT" || !quotation.status
-          ? "SENT"
-          : quotation.status;
+      const status = quotation.status || "DRAFT";
 
       const quotationToSave: QuotationData = {
         ...quotation,
@@ -149,7 +146,7 @@ export function QuotationProvider({
         setQuotationState((prev) => ({
           ...prev,
           id: savedQuotation.id,
-          status: savedQuotation.status ?? status,
+          status: (savedQuotation.status as string) ?? status,
         }));
       }
     } catch (error) {

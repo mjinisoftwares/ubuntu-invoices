@@ -24,7 +24,7 @@ export default function QuotationItem({ item, index, canRemove }: QuotationItemP
         />
       </div>
       <div className="flex-1 w-full md:w-48">
-        <label className="text-sm font-medium mb-1 block">Pickup Point</label>
+        <label className="text-xs font-medium mb-1 block">Pickup Point</label>
         <Input
           type="text"
           value={item.pickupPaid}

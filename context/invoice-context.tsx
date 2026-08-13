@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState } from "react";
 import { InvoiceData, InvoiceItem } from "@/types/invoice";
+import { saveInvoiceToHistory } from "@/utils/history";
 
 interface InvoiceContextProps {
   invoice: InvoiceData;
@@ -13,6 +14,7 @@ interface InvoiceContextProps {
     field: K,
     value: InvoiceItem[K]
   ) => void;
+  saveInvoice: () => Promise<void>;
 }
 
 const defaultItem = (): InvoiceItem => ({
@@ -144,6 +146,30 @@ export function InvoiceProvider({
     });
   };
 
+  const saveInvoice = async () => {
+    try {
+      const status = invoice.status || "DRAFT";
+
+      const invoiceToSave: InvoiceData = {
+        ...invoice,
+        status,
+      };
+
+      const savedInvoice = await saveInvoiceToHistory(invoiceToSave);
+
+      if (savedInvoice?.id) {
+        setInvoiceState((prev) => ({
+          ...prev,
+          id: savedInvoice.id,
+          status: (savedInvoice.status as string) ?? status,
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to save invoice:", error);
+      throw error;
+    }
+  };
+
   return (
     <InvoiceContext.Provider
       value={{
@@ -152,6 +178,7 @@ export function InvoiceProvider({
         addItem,
         removeItem,
         updateItem,
+        saveInvoice,
       }}
     >
       {children}
