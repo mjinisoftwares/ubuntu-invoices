@@ -4,6 +4,7 @@ export interface QuotationItem {
   pickupPaid: string;
   dropoffReturnTrip: string;
   amount: number | "";
+  numberOfDays: number | "";
 }
 
 export interface QuotationData {
@@ -19,4 +20,5 @@ export interface QuotationData {
   total: number;
   notes?: string;
   status?: string;
+  numberOfDays?: number;
 }

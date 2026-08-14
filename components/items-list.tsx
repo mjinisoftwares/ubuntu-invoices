@@ -23,6 +23,7 @@ export default function ItemsList() {
             item={item}
             index={index}
             canRemove={invoice.items.length > 1}
+            
           />
         ))}
       </CardContent>

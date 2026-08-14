@@ -23,6 +23,8 @@ const defaultItem = (): InvoiceItem => ({
   quantity: 1,
   rate: 0,
   amount: 0,
+  numberOfDays: 0,
+
 });
 
 const defaultInvoice = (): InvoiceData => {
@@ -44,6 +46,7 @@ const defaultInvoice = (): InvoiceData => {
     total: 0,
     notes: "",
     status: "DRAFT",
+    numberOfDays: 0,
   };
 };
 

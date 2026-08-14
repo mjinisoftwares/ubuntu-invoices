@@ -176,6 +176,9 @@ export default function QuotationPreview({
                       Date
                     </th>
                     <th className="text-left py-2 px-3 font-semibold text-gray-600">
+                      No of Days
+                    </th>
+                    <th className="text-left py-2 px-3 font-semibold text-gray-600">
                       Pickup Point
                     </th>
                     <th className="text-left py-2 px-3 font-semibold text-gray-600">
@@ -184,6 +187,7 @@ export default function QuotationPreview({
                     <th className="text-right py-2 px-3 font-semibold text-gray-600">
                       Amount
                     </th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -195,6 +199,7 @@ export default function QuotationPreview({
                       <td className="py-2 px-3 whitespace-nowrap">
                         {item.date ? formatDate(item.date) : ""}
                       </td>
+                      <td className="py-2 px-3">{item.numberOfDays || 0}</td>
                       <td className="py-2 px-3">{item.pickupPaid}</td>
                       <td className="py-2 px-3">{item.dropoffReturnTrip}</td>
                       <td className="py-2 px-3 text-right font-semibold">

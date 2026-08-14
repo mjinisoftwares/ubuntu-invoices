@@ -88,6 +88,16 @@ export default function InvoiceItem({
         />
       </div>
       <div className="col-span-2">
+        <Label>No. of Days</Label>
+        <Input
+          type="number"
+          min="0"
+          value={item.numberOfDays}
+          onChange={(e) => updateItem(index, "numberOfDays", e.target.value === "" ? 0 : Number(e.target.value))}
+          
+        />
+      </div>
+      <div className="col-span-2">
         <Label>Amount</Label>
         <div className="h-10 px-3 py-2 bg-gray-50 border rounded-md flex items-center">
           KES {typeof item.amount === "number" ? item.amount.toFixed(2) : "0.00"}

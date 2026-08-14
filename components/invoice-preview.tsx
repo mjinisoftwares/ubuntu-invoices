@@ -178,6 +178,9 @@ export default function InvoicePreview({
                       Rate
                     </th>
                     <th className="text-right py-2 px-3 font-semibold text-gray-600">
+                      No of Days
+                    </th>
+                    <th className="text-right py-2 px-3 font-semibold text-gray-600">
                       Amount
                     </th>
                   </tr>
@@ -192,6 +195,9 @@ export default function InvoicePreview({
                       <td className="py-2 px-3 text-center">{item.quantity}</td>
                       <td className="py-2 px-3 text-right">
                         KES {Number(item.rate).toFixed(2)}
+                      </td>
+                      <td className="py-2 px-3 text-right font-semibold">
+                        {Number(item.numberOfDays).toFixed(0)}
                       </td>
                       <td className="py-2 px-3 text-right font-semibold">
                         KES {Number(item.amount).toFixed(2)}

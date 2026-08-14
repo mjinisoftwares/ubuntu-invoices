@@ -26,6 +26,8 @@ const defaultItem = (): QuotationItem => {
     pickupPaid: "",
     dropoffReturnTrip: "",
     amount: 0,
+    numberOfDays: 0,
+
   };
 };
 
@@ -45,6 +47,7 @@ const defaultQuotation = (): QuotationData => {
     total: 0,
     notes: "",
     status: "DRAFT",
+    numberOfDays: 0,
   };
 };
 

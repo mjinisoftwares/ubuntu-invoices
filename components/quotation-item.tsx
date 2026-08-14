@@ -24,6 +24,14 @@ export default function QuotationItem({ item, index, canRemove }: QuotationItemP
         />
       </div>
       <div className="flex-1 w-full md:w-48">
+        <label className="text-sm font-medium mb-1 block">No. of Days</label>
+        <Input
+          type="number"
+          value={item.numberOfDays}
+          onChange={(e) => updateItem(index, "numberOfDays", e.target.value === "" ? "" : Number(e.target.value))}
+        />
+      </div>
+      <div className="flex-1 w-full md:w-48">
         <label className="text-xs font-medium mb-1 block">Pickup Point</label>
         <Input
           type="text"

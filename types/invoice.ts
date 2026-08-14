@@ -4,6 +4,7 @@ export interface InvoiceItem {
   quantity: number | "";
   rate: number | "";
   amount: number;
+  numberOfDays: number | "";
 }
 
 export interface InvoiceData {
@@ -21,5 +22,6 @@ export interface InvoiceData {
   subtotal: number;
   total: number;
   notes?: string;
-  status?: string;
+  status?: string;  
+  numberOfDays?: number;
 }

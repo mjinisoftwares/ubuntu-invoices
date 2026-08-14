@@ -92,6 +92,7 @@ export default function RecordsList({ onSelectTab }: { onSelectTab: (tab: "invoi
                     <th className="py-3 px-4 font-semibold text-gray-600">Document ID</th>
                     <th className="py-3 px-4 font-semibold text-gray-600">Client</th>
                     <th className="py-3 px-4 font-semibold text-gray-600">Date</th>
+                    <th className="py-3 px-4 font-semibold text-gray-600">No of Days</th>
                     <th className="py-3 px-4 font-semibold text-gray-600">Total Amount</th>
                     <th className="py-3 px-4 font-semibold text-gray-600 text-right">Actions</th>
                   </tr>
@@ -102,6 +103,7 @@ export default function RecordsList({ onSelectTab }: { onSelectTab: (tab: "invoi
                       <td className="py-3 px-4 font-bold">{q.quotationNumber}</td>
                       <td className="py-3 px-4">{q.toName || "Unknown"}</td>
                       <td className="py-3 px-4 text-gray-500">{q.date ? formatDate(q.date) : "No date"}</td>
+                      <td className="py-3 px-4 text-gray-500">{q.numberOfDays || 0}</td>
                       <td className="py-3 px-4 font-medium">KES {Number(q.total).toFixed(2)}</td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex justify-end gap-2">
@@ -138,6 +140,7 @@ export default function RecordsList({ onSelectTab }: { onSelectTab: (tab: "invoi
                     <th className="py-3 px-4 font-semibold text-gray-600">Document ID</th>
                     <th className="py-3 px-4 font-semibold text-gray-600">Client</th>
                     <th className="py-3 px-4 font-semibold text-gray-600">Date</th>
+                    <th className="py-3 px-4 font-semibold text-gray-600">No of Days</th>
                     <th className="py-3 px-4 font-semibold text-gray-600">Total Amount</th>
                     <th className="py-3 px-4 font-semibold text-gray-600 text-right">Actions</th>
                   </tr>
@@ -148,6 +151,7 @@ export default function RecordsList({ onSelectTab }: { onSelectTab: (tab: "invoi
                       <td className="py-3 px-4 font-bold">{inv.invoiceNumber}</td>
                       <td className="py-3 px-4">{inv.toName || "Unknown"}</td>
                       <td className="py-3 px-4 text-gray-500">{inv.date ? formatDate(inv.date) : "No date"}</td>
+                      <td className="py-3 px-4 text-gray-500">{inv.numberOfDays || ""}</td>
                       <td className="py-3 px-4 font-medium">KES {Number(inv.total).toFixed(2)}</td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex justify-end gap-2">
