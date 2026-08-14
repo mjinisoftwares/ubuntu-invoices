@@ -22,4 +22,6 @@ export interface QuotationData {
   notes?: string;
   status?: string;
   numberOfDays?: number;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }

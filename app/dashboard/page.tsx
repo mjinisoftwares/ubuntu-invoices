@@ -9,7 +9,7 @@ export default async function Page() {
       client: true,
     },
     orderBy: {
-      issueDate: "desc",
+      updatedAt: "desc",
     },
   })
 
@@ -18,7 +18,7 @@ export default async function Page() {
       client: true,
     },
     orderBy: {
-      issueDate: "desc",
+      updatedAt: "desc",
     },
   })
 
@@ -26,6 +26,7 @@ export default async function Page() {
   // Build combined list of recent documents for the table
   const combinedDocs = [
     ...invoiceDb.map((inv) => ({
+      savedAt: inv.updatedAt || inv.createdAt,
       date: inv.issueDate,
       header: `Invoice #${inv.invoiceNumber} - ${inv.client.name}`,
       type: "Invoice",
@@ -35,6 +36,7 @@ export default async function Page() {
       reviewer: inv.client.email,
     })),
     ...quotationDb.map((qtn) => ({
+      savedAt: qtn.updatedAt || qtn.createdAt,
       date: qtn.issueDate,
       header: `Quotation #${qtn.quotationNumber} - ${qtn.client.name}`,
       type: "Quotation",
@@ -45,8 +47,8 @@ export default async function Page() {
     })),
   ]
 
-  // Sort combined documents by date newest
-  combinedDocs.sort((a, b) => b.date.getTime() - a.date.getTime())
+  // Sort combined documents by most recently saved first
+  combinedDocs.sort((a, b) => b.savedAt.getTime() - a.savedAt.getTime())
 
   // Map to the exact DataTable format (needs id as number)
   const mappedTableData = combinedDocs.map((doc, idx) => ({

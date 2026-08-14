@@ -9,7 +9,7 @@ import { revalidatePath } from "next/cache";
 export async function getInvoiceHistory(): Promise<InvoiceData[]> {
   const invoices = await prisma.invoice.findMany({
     orderBy: {
-      issueDate: "desc",
+      updatedAt: "desc",
     },
     include: {
       client: true,
@@ -75,6 +75,8 @@ export async function getInvoiceHistory(): Promise<InvoiceData[]> {
       notes: originalNotes,
       status: inv.status,
       numberOfDays: inv.numberOfDays || 1,
+      createdAt: inv.createdAt,
+      updatedAt: inv.updatedAt,
     };
   });
 }
@@ -187,7 +189,7 @@ export async function updateInvoiceStatus(invoiceNumber: string, status: string)
 export async function getQuotationHistory(): Promise<QuotationData[]> {
   const quotations = await prisma.quotation.findMany({
     orderBy: {
-      issueDate: "desc",
+      updatedAt: "desc",
     },
     include: {
       client: true,
@@ -255,6 +257,8 @@ export async function getQuotationHistory(): Promise<QuotationData[]> {
       notes: originalNotes,
       status: qtn.status,
       numberOfDays: qtn.numberOfDays || 1,
+      createdAt: qtn.createdAt,
+      updatedAt: qtn.updatedAt,
     };
   });
 }
