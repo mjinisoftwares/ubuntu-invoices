@@ -103,7 +103,9 @@ export default function RecordsList({ onSelectTab }: { onSelectTab: (tab: "invoi
                       <td className="py-3 px-4 font-bold">{q.quotationNumber}</td>
                       <td className="py-3 px-4">{q.toName || "Unknown"}</td>
                       <td className="py-3 px-4 text-gray-500">{q.date ? formatDate(q.date) : "No date"}</td>
-                      <td className="py-3 px-4 text-gray-500">{q.numberOfDays || 0}</td>
+                      <td className="py-3 px-4 text-gray-500">
+                        {q.items?.reduce((sum, item) => sum + (item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1), 0) || q.numberOfDays || 1}
+                      </td>
                       <td className="py-3 px-4 font-medium">KES {Number(q.total).toFixed(2)}</td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex justify-end gap-2">
@@ -151,7 +153,9 @@ export default function RecordsList({ onSelectTab }: { onSelectTab: (tab: "invoi
                       <td className="py-3 px-4 font-bold">{inv.invoiceNumber}</td>
                       <td className="py-3 px-4">{inv.toName || "Unknown"}</td>
                       <td className="py-3 px-4 text-gray-500">{inv.date ? formatDate(inv.date) : "No date"}</td>
-                      <td className="py-3 px-4 text-gray-500">{inv.numberOfDays || ""}</td>
+                      <td className="py-3 px-4 text-gray-500">
+                        {inv.items?.reduce((sum, item) => sum + (item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1), 0) || inv.numberOfDays || 1}
+                      </td>
                       <td className="py-3 px-4 font-medium">KES {Number(inv.total).toFixed(2)}</td>
                       <td className="py-3 px-4 text-right">
                         <div className="flex justify-end gap-2">

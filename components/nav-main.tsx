@@ -27,8 +27,7 @@ export function NavMain({
           <SidebarMenuItem className="ml-4 flex items-center gap-2 mb-2 font-semibold text-md">
 
         
-
-            Quotations & Invoices
+Admin Panel
           </SidebarMenuItem>
         </SidebarMenu>
             <hr className="border-gray-300" />

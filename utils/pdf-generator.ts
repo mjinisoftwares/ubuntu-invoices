@@ -233,16 +233,18 @@ export async function generateInvoicePDF(
 
   // Table header row
   const colDesc = ML;
-  const colQty  = ML + CW * 0.52;
-  const colRate = ML + CW * 0.68;
+  const colQty  = ML + CW * 0.44;
+  const colRate = ML + CW * 0.64;
+  const colDays = ML + CW * 0.78;
   const colAmt  = ML + CW;
 
   drawFilledRect(pdf, ML, y, CW, 7, "#f3f4f6");
   setFont(pdf, 8, "bold", "#374151");
   pdf.text("Description",  colDesc + 2, y + 4.8);
-  pdf.text("Qty",           colQty,     y + 4.8, { align: "center" });
-  pdf.text("Rate",          colRate + 4, y + 4.8, { align: "right" });
-  pdf.text("Amount",        colAmt,      y + 4.8, { align: "right" });
+  pdf.text("Qty",          colQty,      y + 4.8, { align: "center" });
+  pdf.text("Rate",         colRate,     y + 4.8, { align: "right" });
+  pdf.text("Days",         colDays,     y + 4.8, { align: "center" });
+  pdf.text("Amount",       colAmt,      y + 4.8, { align: "right" });
 
   y += 7;
 
@@ -252,16 +254,18 @@ export async function generateInvoicePDF(
     if (i % 2 === 1) drawFilledRect(pdf, ML, y, CW, rowH, "#f9fafb");
     setFont(pdf, 8, "normal", "#111111");
     pdf.text(item.description || "", colDesc + 2, y + 4.8, {
-      maxWidth: CW * 0.48,
+      maxWidth: CW * 0.38,
     });
     pdf.text(String(item.quantity ?? ""), colQty, y + 4.8, { align: "center" });
     setFont(pdf, 8, "normal", "#374151");
     pdf.text(
       `KES ${Number(item.rate).toFixed(2)}`,
-      colRate + 4,
+      colRate,
       y + 4.8,
       { align: "right" }
     );
+    const itemDays = item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1;
+    pdf.text(String(itemDays), colDays, y + 4.8, { align: "center" });
     setFont(pdf, 8, "bold", "#111111");
     pdf.text(
       `KES ${Number(item.amount).toFixed(2)}`,
@@ -427,13 +431,15 @@ export async function generateQuotationPDF(
 
   // Column positions for quotation table
   const qColDate    = ML;
-  const qColPickup  = ML + CW * 0.22;
-  const qColDrop    = ML + CW * 0.58;
+  const qColDays    = ML + CW * 0.20;
+  const qColPickup  = ML + CW * 0.32;
+  const qColDrop    = ML + CW * 0.64;
   const qColAmt     = ML + CW;
 
   drawFilledRect(pdf, ML, y, CW, 7, "#f3f4f6");
   setFont(pdf, 8, "bold", "#374151");
   pdf.text("Date",             qColDate + 2,   y + 4.8);
+  pdf.text("Days",             qColDays,       y + 4.8, { align: "center" });
   pdf.text("Pickup Point",     qColPickup + 2,  y + 4.8);
   pdf.text("Dropoff / Return", qColDrop + 2,    y + 4.8);
   pdf.text("Amount",           qColAmt,         y + 4.8, { align: "right" });
@@ -445,11 +451,13 @@ export async function generateQuotationPDF(
     if (i % 2 === 1) drawFilledRect(pdf, ML, y, CW, rowH, "#f9fafb");
     setFont(pdf, 8, "normal", "#111111");
     pdf.text(item.date ? formatDate(item.date) : "", qColDate + 2, y + 4.8);
+    const itemDays = item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1;
+    pdf.text(String(itemDays), qColDays, y + 4.8, { align: "center" });
     pdf.text(item.pickupPaid || "", qColPickup + 2, y + 4.8, {
-      maxWidth: CW * 0.34,
+      maxWidth: CW * 0.30,
     });
     pdf.text(item.dropoffReturnTrip || "", qColDrop + 2, y + 4.8, {
-      maxWidth: CW * 0.32,
+      maxWidth: CW * 0.28,
     });
     setFont(pdf, 8, "bold", "#111111");
     pdf.text(

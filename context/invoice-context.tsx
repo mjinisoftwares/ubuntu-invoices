@@ -22,9 +22,8 @@ const defaultItem = (): InvoiceItem => ({
   description: "",
   quantity: 1,
   rate: 0,
+  numberOfDays: 1,
   amount: 0,
-  numberOfDays: 0,
-
 });
 
 const defaultInvoice = (): InvoiceData => {
@@ -46,7 +45,7 @@ const defaultInvoice = (): InvoiceData => {
     total: 0,
     notes: "",
     status: "DRAFT",
-    numberOfDays: 0,
+    numberOfDays: 1,
   };
 };
 
@@ -55,6 +54,11 @@ const recalculateTotals = (
 ): InvoiceData => {
   const subtotal = state.items.reduce((sum, item) => {
     return sum + (Number(item.amount) || 0);
+  }, 0);
+
+  const totalDays = state.items.reduce((sum, item) => {
+    const days = item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1;
+    return sum + days;
   }, 0);
 
   const taxRate = Number(state.taxRate) || 0;
@@ -66,6 +70,7 @@ const recalculateTotals = (
     subtotal,
     taxAmount,
     total,
+    numberOfDays: totalDays,
   };
 };
 
@@ -135,10 +140,14 @@ export function InvoiceProvider({
           Number(updatedItem.quantity) || 0;
         const rate =
           Number(updatedItem.rate) || 0;
+        const days =
+          updatedItem.numberOfDays === ""
+            ? 1
+            : Number(updatedItem.numberOfDays) || 1;
 
         return {
           ...updatedItem,
-          amount: quantity * rate,
+          amount: quantity * rate * days,
         };
       });
 

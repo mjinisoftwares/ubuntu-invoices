@@ -156,12 +156,13 @@ export default function QuotationsClient({
           date: today,
           pickupPaid: "",
           dropoffReturnTrip: "",
+          numberOfDays: 1,
           amount: 0,
+          status:"DRAFT",
         },
       ],
       total: 0,
       notes: "",
-      status: "DRAFT",
     });
 
     toast.info("Created new quotation draft.");
@@ -302,6 +303,34 @@ export default function QuotationsClient({
             {row.original.date ? formatDate(row.original.date) : "N/A"}
           </span>
         ),
+      },
+      {
+        accessorKey: "numberOfDays",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="-ml-3 h-8 font-semibold"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            <span>Days</span>
+            {column.getIsSorted() === "desc" ? (
+              <ArrowDown className="ml-2 size-3.5" />
+            ) : column.getIsSorted() === "asc" ? (
+              <ArrowUp className="ml-2 size-3.5" />
+            ) : (
+              <ArrowUpDown className="ml-2 size-3.5 text-muted-foreground/60" />
+            )}
+          </Button>
+        ),
+        cell: ({ row }) => {
+          const days =
+            row.original.items?.reduce(
+              (sum, item) => sum + (item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1),
+              0
+            ) || row.original.numberOfDays || 1;
+          return <span className="text-xs font-medium">{days}</span>;
+        },
       },
       {
         accessorKey: "total",

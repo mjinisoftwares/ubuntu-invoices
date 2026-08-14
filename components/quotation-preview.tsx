@@ -175,7 +175,7 @@ export default function QuotationPreview({
                     <th className="text-left py-2 px-3 font-semibold text-gray-600">
                       Date
                     </th>
-                    <th className="text-left py-2 px-3 font-semibold text-gray-600">
+                    <th className="text-center py-2 px-3 font-semibold text-gray-600">
                       No of Days
                     </th>
                     <th className="text-left py-2 px-3 font-semibold text-gray-600">
@@ -187,7 +187,6 @@ export default function QuotationPreview({
                     <th className="text-right py-2 px-3 font-semibold text-gray-600">
                       Amount
                     </th>
-
                   </tr>
                 </thead>
                 <tbody>
@@ -199,7 +198,9 @@ export default function QuotationPreview({
                       <td className="py-2 px-3 whitespace-nowrap">
                         {item.date ? formatDate(item.date) : ""}
                       </td>
-                      <td className="py-2 px-3">{item.numberOfDays || 0}</td>
+                      <td className="py-2 px-3 text-center font-medium">
+                        {item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1}
+                      </td>
                       <td className="py-2 px-3">{item.pickupPaid}</td>
                       <td className="py-2 px-3">{item.dropoffReturnTrip}</td>
                       <td className="py-2 px-3 text-right font-semibold">
@@ -218,6 +219,25 @@ export default function QuotationPreview({
                   <span>Total</span>
                   <span>KES {Number(quotation.total).toFixed(2)}</span>
                 </div>
+
+                  {/* Status badge */}
+                {quotation.status && (
+                  <div className="mt-3 text-center">
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-semibold ${
+                        quotation.status === "DRAFT"
+                          ? "bg-gray-200 text-gray-600"
+                          : quotation.status === "ACCEPTED"
+                          ? "bg-green-100 text-green-700"
+                          : quotation.status === "REJECTED"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-blue-100 text-blue-700"
+                      }`}
+                    >
+                      {quotation.status}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 

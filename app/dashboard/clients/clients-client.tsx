@@ -80,6 +80,7 @@ import {
 } from "@/components/ui/table";
 import { formatDate } from "@/utils/formatters";
 import { toast } from "sonner";
+import Error from "next/error";
 
 interface ClientsClientProps {
   initialClients: ClientData[];
@@ -246,6 +247,7 @@ export default function ClientsClient({ initialClients }: ClientsClientProps) {
           id: crypto.randomUUID(),
           description: "",
           quantity: 1,
+          numberOfDays: 1,
           rate: 0,
           amount: 0,
         },
@@ -256,6 +258,7 @@ export default function ClientsClient({ initialClients }: ClientsClientProps) {
       total: 0,
       notes: "",
       status: "DRAFT",
+      numberOfDays: 1,
     });
     router.push("/dashboard/invoices");
     toast.info(`Creating invoice for ${client.name}`);
@@ -276,9 +279,11 @@ export default function ClientsClient({ initialClients }: ClientsClientProps) {
         {
           id: crypto.randomUUID(),
           date: today,
-          pickupPaid: "",
-          dropoffReturnTrip: "",
+          numberOfDays: 1,
           amount: 0,
+          pickupPaid:"",
+          dropoffReturnTrip:"",
+          status:"DRAFT",
         },
       ],
       total: 0,

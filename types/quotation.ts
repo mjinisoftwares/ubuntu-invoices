@@ -5,6 +5,7 @@ export interface QuotationItem {
   dropoffReturnTrip: string;
   amount: number | "";
   numberOfDays: number | "";
+  status:string;
 }
 
 export interface QuotationData {

@@ -120,7 +120,7 @@ export default function InvoicePreview({
             <hr className="border-gray-200" />
 
             {/* FROM / BILL TO */}
-            <div className="flex flex-row justify-between gap-4 pb-2">
+            <div className="flex flex-row justify-between gap-4 pb-2 w-full">
               <div>
                 <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">
                   From
@@ -197,7 +197,7 @@ export default function InvoicePreview({
                         KES {Number(item.rate).toFixed(2)}
                       </td>
                       <td className="py-2 px-3 text-right font-semibold">
-                        {Number(item.numberOfDays).toFixed(0)}
+                        {item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1}
                       </td>
                       <td className="py-2 px-3 text-right font-semibold">
                         KES {Number(item.amount).toFixed(2)}

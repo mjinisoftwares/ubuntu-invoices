@@ -24,9 +24,10 @@ const defaultItem = (): QuotationItem => {
     id: crypto.randomUUID(),
     date: today,
     pickupPaid: "",
-    dropoffReturnTrip: "",
+    dropoffReturnTrip: "",   
+    numberOfDays: 1,
     amount: 0,
-    numberOfDays: 0,
+    status:"DRAFT",
 
   };
 };

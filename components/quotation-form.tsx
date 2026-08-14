@@ -25,7 +25,7 @@ export default function QuotationForm() {
         date={quotation.date}
         onDateChange={(val) => updateQuotation({ date: val })}
         dueDate={quotation.dueDate || ""}
-        onDueDateChange={(val) => updateQuotation({ dueDate: val })}
+        onDueDateChange={(val) => updateQuotation({ dueDate: val })}        
         status={quotation.status || "DRAFT"}
         onStatusChange={(val) => updateQuotation({ status: val })}
         statusOptions={QUOTATION_STATUS_OPTIONS}

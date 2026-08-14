@@ -46,19 +46,35 @@ export async function getInvoiceHistory(): Promise<InvoiceData[]> {
       fromEmail,
       toName: inv.client.name,
       toEmail: inv.client.email,
-      items: inv.items.map((item) => ({
-        id: item.id,
-        description: item.description,
-        quantity: item.quantity,
-        rate: Number(item.unitPrice),
-        amount: Number(item.amount),
-      })),
+      items: inv.items.map((item) => {
+        let description = item.description;
+        let numberOfDays = 1;
+        try {
+          const parsed = JSON.parse(item.description);
+          if (parsed && typeof parsed === "object") {
+            description = parsed.description ?? item.description;
+            numberOfDays = parsed.numberOfDays ?? 1;
+          }
+        } catch {
+          description = item.description;
+        }
+
+        return {
+          id: item.id,
+          description,
+          quantity: item.quantity,
+          rate: Number(item.unitPrice),
+          numberOfDays,
+          amount: Number(item.amount),
+        };
+      }),
       taxRate,
       taxAmount: Number(inv.taxAmount),
       subtotal: Number(inv.subtotal),
       total: Number(inv.totalAmount),
       notes: originalNotes,
       status: inv.status,
+      numberOfDays: inv.numberOfDays || 1,
     };
   });
 }
@@ -84,11 +100,19 @@ export async function saveInvoiceToHistory(invoice: InvoiceData) {
 
   // 3. Prepare items data
   const itemsData = invoice.items.map((item) => ({
-    description: item.description,
+    description: JSON.stringify({
+      description: item.description,
+      numberOfDays: item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1,
+    }),
     quantity: item.quantity === "" ? 0 : Number(item.quantity),
     unitPrice: item.rate === "" ? 0 : Number(item.rate),
     amount: item.amount,
   }));
+
+  const totalDays = invoice.items.reduce(
+    (sum, item) => sum + (item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1),
+    0
+  );
 
   // 4. Upsert Invoice
   const existingInvoice = await prisma.invoice.findUnique({
@@ -109,6 +133,7 @@ export async function saveInvoiceToHistory(invoice: InvoiceData) {
       data: {
         issueDate: new Date(invoice.date),
         dueDate: invoice.dueDate ? new Date(invoice.dueDate) : null,
+        numberOfDays: totalDays,
         subtotal: invoice.subtotal,
         taxAmount: invoice.taxAmount,
         totalAmount: invoice.total,
@@ -126,6 +151,7 @@ export async function saveInvoiceToHistory(invoice: InvoiceData) {
         invoiceNumber: invoice.invoiceNumber,
         issueDate: new Date(invoice.date),
         dueDate: invoice.dueDate ? new Date(invoice.dueDate) : null,
+        numberOfDays: totalDays,
         subtotal: invoice.subtotal,
         taxAmount: invoice.taxAmount,
         totalAmount: invoice.total,
@@ -200,6 +226,7 @@ export async function getQuotationHistory(): Promise<QuotationData[]> {
         let date = qtn.issueDate.toISOString().split("T")[0];
         let pickupPaid = "";
         let dropoffReturnTrip = "";
+        let numberOfDays = 1;
 
         try {
           const parsedDesc = JSON.parse(item.description);
@@ -207,6 +234,7 @@ export async function getQuotationHistory(): Promise<QuotationData[]> {
             date = parsedDesc.date ?? date;
             pickupPaid = parsedDesc.pickupPaid ?? "";
             dropoffReturnTrip = parsedDesc.dropoffReturnTrip ?? "";
+            numberOfDays = parsedDesc.numberOfDays ?? 1;
           }
         } catch (e) {
           // Fallback if not JSON
@@ -218,12 +246,15 @@ export async function getQuotationHistory(): Promise<QuotationData[]> {
           date,
           pickupPaid,
           dropoffReturnTrip,
+          numberOfDays,
           amount: Number(item.amount),
+          status: qtn.status,
         };
       }),
       total: Number(qtn.totalAmount),
       notes: originalNotes,
       status: qtn.status,
+      numberOfDays: qtn.numberOfDays || 1,
     };
   });
 }
@@ -252,11 +283,17 @@ export async function saveQuotationToHistory(quotation: QuotationData) {
       date: item.date,
       pickupPaid: item.pickupPaid,
       dropoffReturnTrip: item.dropoffReturnTrip,
+      numberOfDays: item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1,
     }),
     quantity: 1,
     unitPrice: item.amount === "" ? 0 : Number(item.amount),
     amount: item.amount === "" ? 0 : Number(item.amount),
   }));
+
+  const totalDays = quotation.items.reduce(
+    (sum, item) => sum + (item.numberOfDays === "" ? 1 : Number(item.numberOfDays) || 1),
+    0
+  );
 
   // 4. Upsert Quotation
   const existingQuotation = await prisma.quotation.findUnique({
@@ -277,6 +314,7 @@ export async function saveQuotationToHistory(quotation: QuotationData) {
       data: {
         issueDate: new Date(quotation.date),
         dueDate: quotation.dueDate ? new Date(quotation.dueDate) : null,
+        numberOfDays: totalDays,
         subtotal: quotation.total,
         totalAmount: quotation.total,
         notes: notesJson,
@@ -293,6 +331,7 @@ export async function saveQuotationToHistory(quotation: QuotationData) {
         quotationNumber: quotation.quotationNumber,
         issueDate: new Date(quotation.date),
         dueDate: quotation.dueDate ? new Date(quotation.dueDate) : null,
+        numberOfDays: totalDays,
         subtotal: quotation.total,
         totalAmount: quotation.total,
         notes: notesJson,

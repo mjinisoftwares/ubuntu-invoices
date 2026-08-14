@@ -10,6 +10,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { SquaresFourIcon, ListIcon, FileTextIcon, UsersIcon } from "@phosphor-icons/react"
+import { Separator } from "./ui/separator"
 
 const data = {
   navMain: [
@@ -50,8 +51,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-           <span className="text-2xl font-black ml-4">Ubuntu Logistics</span>
-          </SidebarMenuItem>
+          <img src="/ubuntu.webp" alt="logo" className="ml-4 h-12 sm:h-16 lg:h-20 w-auto object-contain" />
+         
+           </SidebarMenuItem>
+           <Separator />
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
