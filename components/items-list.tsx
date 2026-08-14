@@ -5,7 +5,7 @@ import InvoiceItem from "./invoice-item";
 import { useInvoice } from "@/context/invoice-context";
 
 export default function ItemsList() {
-  const { invoice, addItem } = useInvoice();
+  const { invoice, addItem, } = useInvoice();
 
   return (
     <Card>
