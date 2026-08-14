@@ -124,7 +124,7 @@ export default function QuotationPreview({
             <hr className="border-gray-200" />
 
             {/* FROM / PREPARED FOR */}
-            <div className="flex flex-row justify-between gap-4 pb-2">
+            <div className="flex flex-row justify-between gap-4 pb-2 w-full">
               <div>
                 <p className="text-[9px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">
                   From
